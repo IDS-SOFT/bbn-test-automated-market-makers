@@ -1,10 +1,11 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.0;
+pragma solidity ^0.8.20;
 
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
-import "@openzeppelin/contracts/access/Ownable.sol";
 
-contract AutomatedMarketMaker is Ownable {
+contract AutomatedMarketMaker {
+    address owner;
+
     IERC20 public tokenA; // Token A in the trading pair
     IERC20 public tokenB; // Token B in the trading pair
 
@@ -14,12 +15,18 @@ contract AutomatedMarketMaker is Ownable {
     event TokensSwapped(address indexed user, uint256 amountAIn, uint256 amountBOut);
     event CheckBalance(string text, uint amount);
 
-    // Uncomment the constructor and complete argument details in scripts/deploy.ts to deploy the contract with arguments
+    //complete argument details in scripts/deploy.ts to deploy the contract with arguments
 
-    // constructor(address _tokenA, address _tokenB) {
-    //     tokenA = IERC20(_tokenA);
-    //     tokenB = IERC20(_tokenB);
-    // }
+    constructor(address _tokenA, address _tokenB) {
+        tokenA = IERC20(_tokenA);
+        tokenB = IERC20(_tokenB);
+        owner = msg.sender;
+    }
+
+    modifier onlyOwner() {
+        require(msg.sender == owner, "Only owner can call this fucntion");
+        _;
+    }
 
     // Add liquidity to the AMM
     function addLiquidity(uint256 amountA, uint256 amountB) external {
@@ -60,11 +67,8 @@ contract AutomatedMarketMaker is Ownable {
     }
     
     function getBalance(address user_account) external returns (uint){
-    
-       string memory data = "User Balance is : ";
        uint user_bal = user_account.balance;
-       emit CheckBalance(data, user_bal );
+       emit CheckBalance(user_bal);
        return (user_bal);
-
     }
 }
